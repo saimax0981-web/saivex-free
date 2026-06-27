@@ -1,70 +1,127 @@
 function json(data, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json" } });
-}
-
-function safeName(text, ext) {
-  const base = String(text || "saivex-file").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "saivex-file";
-  return `${base}.${ext}`;
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type"
+    }
+  });
 }
 
 function detectIntent(message) {
   const m = String(message || "").toLowerCase();
-  if (m.includes("create ppt") || m.includes("make ppt") || m.includes("presentation") || m.startsWith("ppt")) return "ppt";
-  if (m.includes("create pdf") || m.includes("make pdf") || m.startsWith("pdf")) return "pdf";
-  if (m.includes("create website") || m.includes("make website") || m.includes("generate website") || m.startsWith("website")) return "website";
-  if (m.includes("generate image") || m.includes("create image") || m.includes("make image") || m.startsWith("image")) return "image";
-  if (m.startsWith("run code") || m.includes("write code") || m.includes("generate code") || m.startsWith("code")) return "code";
-  if (m.startsWith("search:") || m.startsWith("search ") || m.includes("latest") || m.includes("current news")) return "search";
-  if (m.startsWith("agent:")) return "agent";
+  if (/\b(search|latest|news|internet|web)\b/.test(m)) return "search";
+  if (/\b(ppt|presentation|slides|slide deck)\b/.test(m)) return "ppt";
+  if (/\b(pdf|document|report)\b/.test(m)) return "pdf";
+  if (/\b(website|web page|landing page|html site)\b/.test(m)) return "website";
+  if (/\b(generate image|create image|make image|draw|poster|wallpaper|logo)\b/.test(m)) return "image";
+  if (/\b(code|program|script|app|run code)\b/.test(m)) return "code";
+  if (/\b(agent|plan|roadmap|tasks)\b/.test(m)) return "agent";
   return "chat";
 }
 
-function systemPrompt(intent) {
-  const base = "You are SAIVEX, a smart, friendly AI assistant created by Sai Venkat. Keep answers useful, powerful, and clear. You are part of SAIVEX Free running on Cloudflare Pages.";
-  const tool = {
-    ppt: "Create a strong presentation with 8-10 slides. Use clear slide titles and bullet points. Keep it ready for PPTX generation.",
-    pdf: "Create a clean report/document with title, sections, bullet points, and conclusion. Keep it ready for PDF generation.",
-    website: "Create a complete single-file HTML website. Include CSS and JS inside the same HTML file. Return only the full HTML code when possible.",
-    code: "Write clean code. Explain briefly how to use it. Do not claim to actually execute unsafe code.",
-    image: "Create a rich image generation prompt. Also describe the image clearly. The frontend will show a generated preview using a free image endpoint.",
-    search: "Answer using the supplied web-search snippets when available. Be honest if the search source is limited.",
-    agent: "Act like an AI project agent. Give steps, priorities, risks, and next actions."
-  }[intent] || "Chat normally.";
-  return base + "\n" + tool;
+function cleanTopic(message, intent) {
+  return String(message || "")
+    .replace(/^(create|make|generate|build|prepare|write)?\s*/i, "")
+    .replace(new RegExp(`\\b(${intent}|ppt|pdf|presentation|slides|website|web page|image|poster|wallpaper|code|search)\\b`, "ig"), "")
+    .replace(/\b(about|on|for|regarding|of|with internet sources|from internet|using sources)\b/ig, "")
+    .replace(/[:\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim() || "SAIVEX";
+}
+
+function safeName(name, ext) {
+  const base = String(name || "saivex-file").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "saivex-file";
+  return `${base}.${ext}`;
 }
 
 function htmlEscape(s) {
-  return String(s || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  return String(s || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
-function markdownToSimpleHtml(md, title="SAIVEX Document") {
-  let body = htmlEscape(md)
-    .replace(/^### (.*)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.*)$/gm, '<h1>$1</h1>')
-    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-    .replace(/^- (.*)$/gm, '<li>$1</li>')
-    .replace(/\n/g, '<br>');
-  body = body.replace(/(<li>.*?<\/li>)(<br>)?/gs, '<ul>$1</ul>');
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${htmlEscape(title)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;padding:30px;line-height:1.65;color:#211;background:#fff}h1{color:#9a5200;border-bottom:3px solid #ffbf3c;padding-bottom:10px}h2{color:#b66a00;margin-top:28px}li{margin:8px 0}.brand{color:#805000;font-weight:900;letter-spacing:2px}.print{position:fixed;right:18px;top:18px;padding:12px 16px;border:0;border-radius:10px;background:#ffbf3c;font-weight:bold;cursor:pointer}@media print{.print{display:none}body{margin:0;max-width:none}}</style></head><body><button class="print" onclick="print()">Print / Save as PDF</button><div class="brand">SAIVEX</div>${body}</body></html>`;
+function sourceText(sources) {
+  if (!sources.length) return "No live source snippets were available from the configured free search providers.";
+  return sources.map((s, i) => `[${i + 1}] ${s.title}\n${s.snippet}\n${s.url}`).join("\n\n");
 }
 
-function markdownToSlideInner(md){
-  return htmlEscape(md).replace(/^### (.*)$/gm,'<h2>$1</h2>').replace(/^## (.*)$/gm,'<h1>$1</h1>').replace(/^# (.*)$/gm,'<h1>$1</h1>').replace(/^- (.*)$/gm,'<li>$1</li>').replace(/\n/g,'<br>').replace(/(<li>.*?<\/li>)(<br>)?/gs,'<ul>$1</ul>');
+async function braveSearch(query, env) {
+  if (!env.BRAVE_SEARCH_API_KEY) return [];
+  const res = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=8&safesearch=moderate`, {
+    headers: { "Accept": "application/json", "X-Subscription-Token": env.BRAVE_SEARCH_API_KEY }
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.web?.results || []).slice(0, 8).map(r => ({
+    title: r.title || "Brave Search result",
+    snippet: r.description || "",
+    url: r.url || ""
+  }));
 }
 
-function slidesHtml(md, title="SAIVEX Presentation") {
-  const parts = String(md || "").split(/(?=^#{1,2}\s+)/m).filter(Boolean).slice(0, 12);
-  const slides = (parts.length ? parts : [md]).map((p, i) => `<section class="slide"><div class="num">${i+1}</div><div>${markdownToSlideInner(p)}</div></section>`).join("\n");
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${htmlEscape(title)}</title><style>body{margin:0;background:#080300;color:#fff7d6;font-family:Arial,sans-serif}.deck{display:flex;flex-direction:column;gap:28px;padding:32px}.slide{min-height:540px;border:1px solid rgba(255,191,60,.4);border-radius:28px;padding:54px;background:radial-gradient(circle at top right,rgba(255,191,60,.22),transparent 360px),linear-gradient(135deg,#180801,#050200);box-shadow:0 20px 70px rgba(0,0,0,.45);position:relative;page-break-after:always}.num{position:absolute;right:28px;top:20px;color:#ffbf3c;font-weight:900}h1,h2{font-size:46px;color:#ffe7a3;text-shadow:0 0 20px #ff6a00}li{font-size:25px;margin:16px 0;line-height:1.35}.top{position:sticky;top:0;background:#000;padding:12px;z-index:2}.top button{padding:10px 16px;border:0;border-radius:10px;background:#ffbf3c;font-weight:bold}@media print{.top{display:none}.slide{border-radius:0;min-height:90vh}}</style></head><body><div class="top"><button onclick="print()">Print / Save as PDF</button></div><main class="deck">${slides}</main></body></html>`;
+async function duckDuckGoInstant(query) {
+  const sources = [];
+  try {
+    const res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`);
+    const data = await res.json();
+    if (data.AbstractText) sources.push({ title: data.Heading || "DuckDuckGo", snippet: data.AbstractText, url: data.AbstractURL || "" });
+    for (const t of (data.RelatedTopics || []).slice(0, 6)) {
+      if (t.Text) sources.push({ title: "DuckDuckGo related", snippet: t.Text, url: t.FirstURL || "" });
+      if (t.Topics) {
+        for (const inner of t.Topics.slice(0, 3)) {
+          if (inner.Text) sources.push({ title: "DuckDuckGo related", snippet: inner.Text, url: inner.FirstURL || "" });
+        }
+      }
+    }
+  } catch (_) {}
+  return sources;
 }
 
-function imageUrlFromPrompt(prompt, ratio="1:1") {
-  const dims = {"1:1":"1024/1024","16:9":"1280/720","9:16":"720/1280","4:5":"960/1200"}[ratio] || "1024/1024";
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${dims.split('/')[0]}&height=${dims.split('/')[1]}&nologo=true&enhance=true`;
+async function wikipediaSearch(query) {
+  const sources = [];
+  try {
+    const res = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=6&namespace=0&format=json&origin=*`);
+    const data = await res.json();
+    const titles = data[1] || [], snippets = data[2] || [], urls = data[3] || [];
+    titles.forEach((title, i) => sources.push({ title, snippet: snippets[i] || "Wikipedia article", url: urls[i] || "" }));
+  } catch (_) {}
+  return sources;
 }
 
-async function askOpenRouter(env, messages, maxTokens=1400) {
+async function gatherSources(query, env) {
+  const all = [];
+  all.push(...await braveSearch(query, env));
+  all.push(...await duckDuckGoInstant(query));
+  all.push(...await wikipediaSearch(query));
+  const seen = new Set();
+  return all.filter(s => {
+    const key = (s.url || s.title).toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 10);
+}
+
+function systemPrompt(intent) {
+  const common = `You are SAIVEX, a powerful AI assistant with premium Kalinga UI identity. Be useful, direct, and structured. If sources are provided, use them and include a Sources section with the source numbers. Do not invent citations.`;
+  const prompts = {
+    search: "Answer using the provided live source snippets. Include a short Sources section.",
+    pdf: "Create a polished report/document. Use headings, short paragraphs, bullet points, and a Sources section. The content will be converted into a PDF.",
+    ppt: "Create a presentation outline. Use clear slide titles and 4-6 bullet points per slide. Make 8-10 slides when possible. Include a final Sources slide.",
+    website: "Create a complete single-file HTML website. Include CSS inside a style tag and JavaScript only if needed. Use modern premium design. Use source data when provided. Return only the HTML code inside one html code block.",
+    image: "Create a detailed image-generation prompt and a short explanation. Premium cinematic style is preferred.",
+    code: "Write clean usable code with brief setup instructions.",
+    agent: "Act like a project agent. Give plan, steps, risks, and next actions.",
+    chat: "Chat normally."
+  };
+  return common + "\n" + (prompts[intent] || prompts.chat);
+}
+
+async function askOpenRouter(env, messages, maxTokens = 2000) {
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -80,107 +137,105 @@ async function askOpenRouter(env, messages, maxTokens=1400) {
     })
   });
   const result = await response.json();
-  if (!response.ok || !result.choices) throw new Error(JSON.stringify(result).slice(0, 400));
+  if (!response.ok || !result.choices) throw new Error(JSON.stringify(result).slice(0, 500));
   return result.choices?.[0]?.message?.content || "No reply received.";
 }
 
-async function webSearch(query) {
-  const clean = String(query || "").replace(/^search:?/i, "").trim();
-  if (!clean) return "No search query provided.";
-  const sources = [];
-  try {
-    const ddg = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(clean)}&format=json&no_html=1&skip_disambig=1`);
-    const data = await ddg.json();
-    if (data.AbstractText) sources.push(`DuckDuckGo: ${data.AbstractText} ${data.AbstractURL || ""}`);
-    for (const topic of (data.RelatedTopics || []).slice(0, 5)) {
-      if (topic.Text) sources.push(`DuckDuckGo related: ${topic.Text} ${topic.FirstURL || ""}`);
+function extractSlides(markdown, fallbackTitle) {
+  const lines = String(markdown || "").split("\n").map(x => x.trim()).filter(Boolean);
+  const slides = [];
+  let current = null;
+  for (const line of lines) {
+    const heading = line.match(/^#{1,3}\s+(.+)/) || line.match(/^Slide\s*\d+[:.\-]\s*(.+)/i);
+    if (heading) {
+      if (current) slides.push(current);
+      current = { title: heading[1].replace(/\*\*/g, "").slice(0, 90), bullets: [] };
+    } else if (/^[-*•]\s+/.test(line)) {
+      if (!current) current = { title: fallbackTitle || "SAIVEX", bullets: [] };
+      current.bullets.push(line.replace(/^[-*•]\s+/, "").replace(/\*\*/g, "").slice(0, 220));
     }
-  } catch (_) {}
-  try {
-    const wiki = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(clean)}&limit=5&namespace=0&format=json&origin=*`);
-    const w = await wiki.json();
-    const titles = w[1] || [], snippets = w[2] || [], urls = w[3] || [];
-    titles.forEach((t, i) => sources.push(`Wikipedia: ${t} — ${snippets[i] || ""} ${urls[i] || ""}`));
-  } catch (_) {}
-  return sources.length ? sources.join("\n") : "No live snippets returned from the free search sources. Answer from general knowledge and say search was limited.";
+  }
+  if (current) slides.push(current);
+  if (!slides.length) {
+    const chunks = String(markdown || "").split(/\n\n+/).slice(0, 8);
+    chunks.forEach((chunk, i) => slides.push({ title: i === 0 ? fallbackTitle : `Slide ${i + 1}`, bullets: chunk.split(/[.?!]\s+/).filter(Boolean).slice(0, 5) }));
+  }
+  return slides.slice(0, 12).map((s, i) => ({ title: s.title || `Slide ${i + 1}`, bullets: (s.bullets || []).slice(0, 6) }));
 }
 
-function extractSlides(markdown) {
-  const chunks = String(markdown || "").split(/(?=^#{1,2}\s+)/m).filter(Boolean).slice(0, 10);
-  return (chunks.length ? chunks : [markdown]).map((chunk, i) => {
-    const lines = chunk.split("\n").map(x => x.trim()).filter(Boolean);
-    const title = (lines[0] || `Slide ${i+1}`).replace(/^#+\s*/, "").slice(0, 80);
-    const bullets = lines.slice(1).map(x => x.replace(/^-\s*/, "")).filter(Boolean).slice(0, 6);
-    return { title, bullets: bullets.length ? bullets : ["Presented by SAIVEX"] };
-  });
+function imageUrlFromPrompt(prompt, ratio = "1:1") {
+  const map = { "1:1": [1024, 1024], "16:9": [1280, 720], "9:16": [720, 1280], "4:5": [960, 1200] };
+  const [width, height] = map[ratio] || map["1:1"];
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&nologo=true&enhance=true`;
 }
+
+function extractHtml(reply) {
+  const htmlBlock = String(reply || "").match(/```html([\s\S]*?)```/i) || String(reply || "").match(/```([\s\S]*?)```/);
+  let html = htmlBlock ? htmlBlock[1].trim() : String(reply || "").trim();
+  if (!/<!doctype html|<html/i.test(html)) {
+    html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SAIVEX Website</title><style>body{font-family:Arial;padding:40px;line-height:1.6}</style></head><body><pre>${htmlEscape(reply)}</pre></body></html>`;
+  }
+  return html;
+}
+
+export async function onRequestOptions() { return json({ ok: true }); }
 
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
     const body = await request.json();
-    const message = (body.message || "").trim();
+    const message = String(body.message || "").trim();
     const history = Array.isArray(body.history) ? body.history : [];
     const ratio = body.ratio || "1:1";
     if (!message) return json({ reply: "Please type a message first." });
-    if (!env.OPENROUTER_API_KEY) return json({ reply: "OpenRouter API key is missing. Add OPENROUTER_API_KEY in Cloudflare Pages → Settings → Environment variables." });
+    if (!env.OPENROUTER_API_KEY) return json({ reply: "OpenRouter API key missing. Add OPENROUTER_API_KEY in Cloudflare Pages environment variables." });
 
     const intent = detectIntent(message);
+    const topic = cleanTopic(message, intent);
+    const shouldSearch = ["search", "ppt", "pdf", "website"].includes(intent) || /\b(internet|sources|latest|current|news|web)\b/i.test(message);
+    const sources = shouldSearch ? await gatherSources(topic || message, env) : [];
+
     const messages = [{ role: "system", content: systemPrompt(intent) }];
-    if (intent === "search") {
-      const snippets = await webSearch(message);
-      messages.push({ role: "system", content: "Live web-search snippets from free sources:\n" + snippets });
+    if (sources.length || shouldSearch) {
+      messages.push({ role: "system", content: "Live internet/source snippets:\n\n" + sourceText(sources) });
     }
     for (const item of history.slice(-8)) {
       if (!item || !item.message) continue;
       messages.push({ role: item.sender === "bot" ? "assistant" : "user", content: String(item.message).slice(0, 2500) });
     }
     messages.push({ role: "user", content: message });
-    const reply = await askOpenRouter(env, messages, intent === "website" ? 3000 : 1800);
 
-    let extra = { intent };
-    const topic = message.replace(/^(create|make|generate|run)?\s*(ppt|pdf|presentation|website|image|code)\s*(about|for|:)?/i, "").replace(/^search:?/i, "").trim() || "SAIVEX";
+    const maxTokens = intent === "website" ? 3500 : intent === "ppt" || intent === "pdf" ? 2600 : 1800;
+    const reply = await askOpenRouter(env, messages, maxTokens);
 
+    const extra = { intent, sources };
     if (intent === "search") {
-      extra.reply = reply + "\n\nSearch note: SAIVEX used free DuckDuckGo/Wikipedia sources where available."
+      extra.reply = reply + (sources.length ? "" : "\n\nNote: free live search returned limited snippets. For stronger real-time web search, add BRAVE_SEARCH_API_KEY later.");
     }
-
     if (intent === "image") {
-      const style = body.style || "cinematic";
-      const prompt = `${reply}\nStyle: ${style}, premium, detailed, high quality, SAIVEX Kalinga UI energy`;
+      const prompt = `${reply}\nStyle: ${body.style || "cinematic"}, premium, detailed, SAIVEX Kalinga UI, high quality`;
       extra.image = imageUrlFromPrompt(prompt, ratio);
     }
-
     if (intent === "pdf") {
-      const html = markdownToSimpleHtml(reply, topic);
       extra.file_name = safeName(topic || "saivex-document", "pdf");
       extra.file_mime = "application/pdf";
       extra.document_text = reply;
-      extra.preview_content = html;
-      extra.reply = reply + "\n\n✅ PDF is ready. Click Download File to get the real .pdf file.";
+      extra.reply = reply + "\n\n✅ Real PDF download is ready. Click Download PDF.";
     }
-
     if (intent === "ppt") {
-      const html = slidesHtml(reply, topic);
       extra.file_name = safeName(topic || "saivex-presentation", "pptx");
       extra.file_mime = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-      extra.ppt_slides = extractSlides(reply);
-      extra.preview_content = html;
-      extra.reply = reply + "\n\n✅ PPT is ready. Click Download File to get the real .pptx file.";
+      extra.ppt_slides = extractSlides(reply, topic || "SAIVEX Presentation");
+      extra.reply = reply + "\n\n✅ Real PPTX download is ready. Click Download PPTX.";
     }
-
     if (intent === "website") {
-      let html = reply;
-      const match = reply.match(/```html([\s\S]*?)```/i) || reply.match(/```([\s\S]*?)```/);
-      if (match) html = match[1].trim();
-      if (!/<!doctype html|<html/i.test(html)) html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SAIVEX Website</title></head><body><pre>${htmlEscape(reply)}</pre></body></html>`;
+      const html = extractHtml(reply);
       extra.file_name = safeName(topic || "saivex-website", "html");
       extra.file_mime = "text/html";
       extra.file_content = html;
       extra.preview_content = html;
-      extra.reply = "Website generated. Use Preview to view it or Download File to save it.";
+      extra.reply = "✅ Website generated using available source snippets. Click Preview Website or Download HTML.";
     }
-
     if (intent === "code") {
       extra.file_name = safeName(topic || "saivex-code", "txt");
       extra.file_mime = "text/plain";
@@ -189,6 +244,6 @@ export async function onRequestPost(context) {
 
     return json({ reply: extra.reply || reply, conversation_id: body.conversation_id || Date.now(), ...extra });
   } catch (error) {
-    return json({ reply: "Something went wrong in SAIVEX serverless function: " + String(error.message || error).slice(0, 220) }, 200);
+    return json({ reply: "SAIVEX function error: " + String(error.message || error).slice(0, 260) }, 200);
   }
 }
