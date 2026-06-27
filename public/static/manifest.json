@@ -1,0 +1,22 @@
+{
+  "name": "SAIVEX AI",
+  "short_name": "SAIVEX",
+  "description": "Kalinga-themed AI assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080300",
+  "theme_color": "#b66a00",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

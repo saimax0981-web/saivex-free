@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAIVEX Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#ffbf3c;--gold2:#ffe7a3;--orange:#ff6a00;--dark:#050200;--glass:rgba(18,9,3,.62)}
+body{
+  min-height:100vh;
+  overflow:hidden;
+  font-family:Inter,Arial,sans-serif;
+  color:#fff7d6;
+  background:
+    radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,191,60,.22),transparent 330px),
+    radial-gradient(circle at 20% 35%,rgba(255,106,0,.30),transparent 380px),
+    linear-gradient(120deg,#050200,#180801 48%,#00070b);
+}
+#particles{position:fixed;inset:0;z-index:-4}
+.aurora{position:fixed;inset:-25%;z-index:-5;background:conic-gradient(from 120deg,transparent,rgba(255,191,60,.18),transparent,rgba(255,106,0,.18),transparent);filter:blur(70px);animation:aurora 12s ease-in-out infinite alternate}
+@keyframes aurora{to{transform:rotate(10deg) scale(1.08)}}
+.grid{position:fixed;inset:0;z-index:-3;background-image:linear-gradient(rgba(255,191,60,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,191,60,.055) 1px,transparent 1px);background-size:70px 70px;transform:perspective(900px) rotateX(62deg) translateY(15vh);opacity:.28;animation:grid 12s linear infinite}
+@keyframes grid{to{background-position:0 140px}}
+.page{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  align-items:center;
+  gap:38px;
+  padding:28px 5vw;
+  position:relative;
+  z-index:2;
+}
+.scene{
+  height:84vh;
+  min-height:550px;
+  border:1px solid rgba(255,191,60,.22);
+  border-radius:34px;
+  overflow:hidden;
+  position:relative;
+  background:linear-gradient(90deg,rgba(0,0,0,.94),rgba(45,14,3,.65),rgba(0,0,0,.32)),radial-gradient(circle at 74% 72%,rgba(255,106,0,.55),transparent 32%);
+  box-shadow:0 30px 90px rgba(0,0,0,.45),inset 0 0 80px rgba(255,191,60,.06);
+}
+.flag{
+  position:absolute;left:7%;top:16%;width:250px;height:145px;z-index:3;
+  animation:flagIn 1.2s both,flagWave 3s ease-in-out 1.2s infinite;transform-origin:left;
+}
+.flag:before{content:"";position:absolute;left:0;top:-55px;width:8px;height:420px;background:linear-gradient(#ffe7a3,#6c4106,#ffe7a3);border-radius:999px;box-shadow:0 0 18px rgba(255,191,60,.5)}
+.flag:after{content:"KALINGA";position:absolute;left:8px;top:0;width:235px;height:140px;background:linear-gradient(135deg,#3b0403,#951900,#230100);clip-path:polygon(0 0,100% 10%,86% 50%,100% 90%,0 100%);display:flex;align-items:center;justify-content:center;font-family:Cinzel,serif;font-size:30px;letter-spacing:5px;color:#ffe7a3;text-shadow:0 0 18px #ffbf3c}
+@keyframes flagIn{from{opacity:0;transform:translateX(-130px) rotate(-12deg)}to{opacity:1;transform:none}}
+@keyframes flagWave{50%{transform:skewY(4deg) rotate(2deg)}}
+.warrior{
+  position:absolute;left:31%;bottom:3%;width:330px;height:650px;z-index:4;
+  filter:drop-shadow(0 0 35px rgba(255,106,0,.5));
+  animation:warriorIn 1.7s cubic-bezier(.17,.84,.32,1.22) both,warriorIdle 4s ease-in-out 2s infinite;
+}
+@keyframes warriorIn{0%{opacity:0;transform:translateX(-230px) scale(.86)}75%{opacity:1;transform:translateX(15px) scale(1.03)}100%{transform:none}}
+@keyframes warriorIdle{50%{transform:translateY(-9px)}}
+.cape{position:absolute;left:18px;top:130px;width:250px;height:420px;background:linear-gradient(140deg,#870b04,#250000);clip-path:polygon(45% 0,98% 16%,72% 100%,5% 88%);animation:cape 3s infinite ease-in-out}
+@keyframes cape{50%{transform:skewX(6deg)}}
+.body{position:absolute;left:88px;top:165px;width:170px;height:260px;background:repeating-linear-gradient(90deg,#ffbf3c 0 8px,#351301 8px 18px);clip-path:polygon(16% 0,84% 0,100% 100%,0 100%);border-radius:24px}
+.head{position:absolute;left:126px;top:70px;width:96px;height:96px;background:#120701;border:3px solid var(--gold);border-radius:45%;box-shadow:0 0 28px rgba(255,191,60,.45)}
+.helmet{position:absolute;left:96px;top:25px;width:160px;height:90px;background:linear-gradient(90deg,#4a2700,#ffbf3c,#5d3000);clip-path:polygon(6% 100%,18% 30%,50% 0,82% 30%,94% 100%)}
+.crest{position:absolute;left:145px;top:-25px;width:62px;height:90px;background:linear-gradient(#b20b00,#ff5a00);border-radius:80% 80% 20% 20%;animation:crest 2.2s infinite ease-in-out}
+@keyframes crest{50%{transform:rotate(6deg)}}
+.eyes:before,.eyes:after{content:"";position:absolute;top:112px;width:17px;height:5px;background:#00d4ff;border-radius:999px;box-shadow:0 0 18px #00d4ff}.eyes:before{left:150px}.eyes:after{left:192px}
+.arm{position:absolute;top:190px;width:52px;height:210px;background:linear-gradient(#6d3c08,#d99425,#3b1604);border-radius:25px}.arm.l{left:55px;transform:rotate(12deg)}.arm.r{right:45px;transform:rotate(-10deg)}
+.legs:before,.legs:after{content:"";position:absolute;bottom:22px;width:45px;height:245px;background:linear-gradient(90deg,#2b1205,#d99325,#311204);border-radius:25px}.legs:before{left:112px;transform:rotate(5deg)}.legs:after{left:190px;transform:rotate(-7deg)}
+.sword{position:absolute;right:30px;top:330px;width:9px;height:285px;background:linear-gradient(90deg,#aaa,#fff,#999);transform:rotate(-18deg);box-shadow:0 0 24px white}.sword:before{content:"";position:absolute;top:-34px;left:-15px;width:40px;height:40px;background:var(--gold);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.temple{position:absolute;right:7%;bottom:6%;width:300px;height:180px;opacity:.55;background:linear-gradient(#b65a13,#160702);clip-path:polygon(50% 0,65% 22%,65% 36%,86% 36%,86% 100%,14% 100%,14% 36%,35% 36%,35% 22%)}
+.scene-text{position:absolute;left:7%;bottom:8%;z-index:5}.tag{display:inline-block;padding:8px 14px;border-radius:999px;background:rgba(255,191,60,.1);border:1px solid rgba(255,191,60,.25);font-size:12px;font-weight:900;letter-spacing:2px;color:#ffe7a3}.scene-text h2{font-family:Cinzel,serif;font-size:56px;line-height:1;color:#ffe7a3;text-shadow:0 0 28px rgba(255,191,60,.8);margin-top:15px}.scene-text p{margin-top:12px;color:#d8b76f;font-weight:800}
+.login-zone{perspective:1200px}
+.login-card{
+  width:min(100%,480px);
+  margin:auto;
+  padding:22px 34px 26px;
+  border-radius:34px;
+  background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.025)),var(--glass);
+  border:1px solid rgba(255,191,60,.30);
+  box-shadow:0 35px 110px rgba(0,0,0,.5),inset 0 0 42px rgba(255,191,60,.06);
+  backdrop-filter:blur(24px);
+  position:relative;
+  overflow:hidden;
+  animation:panelIn 1s .65s both;
+}
+@keyframes panelIn{from{opacity:0;transform:translateY(55px) rotateX(12deg)}to{opacity:1;transform:none}}
+.login-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--card-x,50%) var(--card-y,50%),rgba(255,191,60,.25),transparent 280px);pointer-events:none}
+.content{position:relative;z-index:2}
+.logo-wrap{width:76px;height:76px;margin:0 auto 7px;display:grid;place-items:center;position:relative}.logo-wrap:before{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(255,191,60,.45);animation:spin 8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.logo{width:70px;height:70px;border-radius:50%;object-fit:cover;box-shadow:0 0 34px rgba(255,191,60,.82)}
+h1{text-align:center;font-family:Cinzel,serif;font-size:34px;letter-spacing:7px;color:#ffe7a3;text-shadow:0 0 30px rgba(255,191,60,.8)}.subtitle{text-align:center;margin:6px 0 13px;color:#d7bd78;font-size:13px}
+.social-row{display:grid;gap:9px;margin-bottom:12px}.social-btn{height:44px;border-radius:15px;border:1px solid rgba(255,191,60,.35);background:rgba(255,255,255,.065);display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;color:#fff2c2;font-weight:900;transition:.25s}.social-btn:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(255,106,0,.16);border-color:rgba(255,191,60,.75);background:rgba(255,191,60,.13)}
+.divider{display:flex;align-items:center;gap:12px;margin:11px 0;color:#b99855;font-size:12px;font-weight:900;letter-spacing:2px}.divider:before,.divider:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,191,60,.48),transparent)}
+.field{position:relative;margin-bottom:11px}.field input{width:100%;height:52px;border-radius:17px;border:1px solid rgba(255,191,60,.26);background:rgba(0,0,0,.34);color:white;outline:none;padding:0 16px 0 48px;font-size:15px}.field label{position:absolute;left:48px;top:50%;transform:translateY(-50%);color:rgba(255,245,210,.58);pointer-events:none;transition:.2s}.field span{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--gold)}.field input:focus{border-color:rgba(255,106,0,.8);box-shadow:0 0 26px rgba(255,106,0,.25)}.field input:focus+label,.field input:not(:placeholder-shown)+label{top:0;left:18px;background:#120802;padding:0 8px;font-size:12px;color:#ffe7a3}
+.login-btn{width:100%;height:54px;border:0;border-radius:18px;background:linear-gradient(90deg,#ffe7a3,#ffbf3c,#ff6a00,#8f1200);font-weight:1000;color:#180800;letter-spacing:1px;cursor:pointer;box-shadow:0 0 30px rgba(255,106,0,.34);transition:.25s}.login-btn:hover{transform:translateY(-3px) scale(1.01)}
+.links{margin-top:13px;display:flex;justify-content:space-between;font-size:13px}.links a{color:#ffdf8a;text-decoration:none;font-weight:800}
+.corner span{position:absolute;width:42px;height:42px;border-color:rgba(255,191,60,.5)}.corner span:nth-child(1){top:18px;left:18px;border-top:2px solid;border-left:2px solid;border-radius:16px 0 0}.corner span:nth-child(2){top:18px;right:18px;border-top:2px solid;border-right:2px solid;border-radius:0 16px 0 0}.corner span:nth-child(3){bottom:18px;left:18px;border-bottom:2px solid;border-left:2px solid;border-radius:0 0 0 16px}.corner span:nth-child(4){bottom:18px;right:18px;border-bottom:2px solid;border-right:2px solid;border-radius:0 0 16px 0}
+@media(max-width:1050px){body{overflow:auto}.page{grid-template-columns:1fr;padding:22px}.scene{height:390px;min-height:390px}.warrior{transform:scale(.56);left:40%;bottom:-165px}.flag{transform:scale(.75);left:4%;top:7%}.scene-text h2{font-size:32px}.scene-text{bottom:8%}}
+@media(max-width:640px){.page{display:flex;padding:16px}.scene{display:none}.login-card{padding:24px 20px;width:100%}h1{font-size:32px}.links{flex-direction:column;text-align:center;gap:10px}body{overflow:auto}}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="aurora"></div>
+<div class="grid"></div>
+
+<section class="page">
+<div class="scene">
+<div class="flag"></div>
+<div class="temple"></div>
+<div class="warrior" id="warrior">
+<div class="cape"></div><div class="legs"></div><div class="body"></div><div class="arm l"></div><div class="arm r"></div><div class="sword"></div><div class="head"></div><div class="eyes"></div><div class="helmet"></div><div class="crest"></div>
+</div>
+<div class="scene-text"><div class="tag">⚔ KALINGA SYSTEM ONLINE</div><h2>RISE WITH<br>SAIVEX</h2><p>Warrior Spirit • AI Power • Golden Future</p></div>
+</div>
+
+<div class="login-zone">
+<div class="login-card" id="loginCard">
+<div class="corner"><span></span><span></span><span></span><span></span></div>
+<div class="content">
+<div class="logo-wrap"><img class="logo" src="/static/logo.png" alt="SAIVEX"></div>
+<h1>SAIVEX</h1>
+<p class="subtitle">Enter the Kalinga AI command system</p>
+
+<div class="social-row">
+<a class="social-btn" href="/login/google">🌐 Continue with Google</a>
+<a class="social-btn" href="/login/apple"> Continue with Apple</a>
+<a class="social-btn" href="/login/phone">📞 Continue with Phone</a>
+</div>
+
+<div class="divider">OR</div>
+
+<form method="POST" action="/login">
+<div class="field"><span>✉</span><input type="email" name="email" placeholder=" " required autocomplete="email"><label>Email address</label></div>
+<div class="field"><span>🔒</span><input type="password" name="password" placeholder=" " required autocomplete="current-password"><label>Password</label></div>
+<button class="login-btn" type="submit">ENTER SAIVEX</button>
+</form>
+
+<div class="links"><a href="forgot_password.html">Forgot Password?</a><a href="signup.html">Create Account</a></div>
+</div>
+</div>
+</div>
+</section>
+
+<script>
+const root=document.documentElement,card=document.getElementById("loginCard"),warrior=document.getElementById("warrior");
+window.addEventListener("mousemove",e=>{
+const x=e.clientX/innerWidth,y=e.clientY/innerHeight;
+root.style.setProperty("--mx",x*100+"%");root.style.setProperty("--my",y*100+"%");
+if(card){const r=card.getBoundingClientRect();card.style.setProperty("--card-x",((e.clientX-r.left)/r.width)*100+"%");card.style.setProperty("--card-y",((e.clientY-r.top)/r.height)*100+"%");card.style.transform=`rotateX(${(.5-y)*6}deg) rotateY(${(x-.5)*6}deg)`;}
+if(warrior){warrior.style.translate=`${(x-.5)*18}px ${(y-.5)*-10}px`;}
+});
+window.addEventListener("mouseleave",()=>{if(card)card.style.transform="none";if(warrior)warrior.style.translate="0 0";});
+
+const canvas=document.getElementById("particles"),ctx=canvas.getContext("2d");
+let particles=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+resize();addEventListener("resize",resize);
+for(let i=0;i<180;i++){particles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2+1,s:Math.random()*0.8+0.2,c:Math.random()>0.2?"#ffbf3c":"#ff6a00"})}
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.y-=p.s;if(p.y<0){p.y=innerHeight;p.x=Math.random()*innerWidth}ctx.beginPath();ctx.fillStyle=p.c;ctx.globalAlpha=.55;ctx.shadowBlur=14;ctx.shadowColor=p.c;ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()});requestAnimationFrame(draw)}
+draw();
+</script>
+</body>
+</html>

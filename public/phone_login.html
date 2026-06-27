@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SAIVEX Phone Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:radial-gradient(circle at top,#3b2204,#080300 55%),#080300;color:#fff7d6;display:flex;justify-content:center;align-items:center;padding:18px}
+.card{width:100%;max-width:430px;background:rgba(255,196,77,.08);border:1px solid rgba(255,196,77,.25);border-radius:26px;padding:28px;box-shadow:0 0 35px rgba(255,191,60,.18)}
+.logo{width:85px;height:85px;border-radius:50%;display:block;margin:0 auto 12px;object-fit:cover;box-shadow:0 0 25px #ffbf3c}
+h1{text-align:center;color:#ffdf8a;letter-spacing:3px;margin-bottom:10px}
+p{text-align:center;color:#d6c08a;font-size:13px;line-height:1.5}
+input{width:100%;padding:16px;border-radius:24px;border:1px solid rgba(255,196,77,.35);background:rgba(0,0,0,.25);color:white;outline:none;margin-bottom:12px;font-size:15px}
+button{width:100%;padding:16px;border:none;border-radius:24px;background:linear-gradient(90deg,#ffbf3c,#b66a00);color:#1b0c00;font-weight:900;font-size:16px;cursor:pointer;margin-bottom:12px}
+button.secondary{background:rgba(255,255,255,.08);color:#fff7d6;border:1px solid rgba(255,196,77,.25)}
+a{display:block;text-align:center;color:#ffdf8a;margin-top:12px;text-decoration:none}
+#otpBox{display:none}
+#status{margin:12px 0;color:#ffdf8a;font-size:13px;text-align:center}
+#recaptcha-container{margin:12px 0;display:flex;justify-content:center}
+</style>
+</head>
+<body>
+<div class="card">
+<img src="/static/logo.png" class="logo">
+<h1>PHONE LOGIN</h1>
+<p>Enter your phone number with country code. Example: +91XXXXXXXXXX</p>
+
+<div id="phoneBox">
+<input id="phoneNumber" placeholder="+91XXXXXXXXXX">
+<div id="recaptcha-container"></div>
+<button onclick="sendPhoneOTP()">Send OTP</button>
+</div>
+
+<div id="otpBox">
+<input id="otpCode" placeholder="Enter OTP">
+<button onclick="verifyPhoneOTP()">Verify & Login</button>
+<button class="secondary" onclick="goBackToPhone()">Change Number</button>
+</div>
+
+<div id="status"></div>
+<a href="login.html">Back to Login</a>
+</div>
+
+<script>
+window.SAIVEX_FIREBASE_CONFIG = {};
+</script>
+<script type="module" src="static/firebase_phone_login.js"></script>
+</body>
+</html>

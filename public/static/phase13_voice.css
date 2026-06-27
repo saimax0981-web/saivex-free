@@ -1,0 +1,173 @@
+/* SAIVEX Phase 13 Voice + Compact Toolbar Fix */
+
+#voiceStatus{
+    animation:voiceGlow 1.5s ease-in-out infinite alternate;
+}
+@keyframes voiceGlow{
+    from{box-shadow:0 0 16px rgba(255,191,60,.22)}
+    to{box-shadow:0 0 32px rgba(0,212,255,.25)}
+}
+
+/* Compact tool row above text box */
+.tool-bar{
+    display:flex !important;
+    gap:6px !important;
+    overflow-x:auto !important;
+    padding-bottom:6px !important;
+    scrollbar-width:none !important;
+    align-items:center !important;
+    flex-wrap:nowrap !important;
+}
+.tool-bar::-webkit-scrollbar{
+    display:none !important;
+}
+
+/* Reduce size of Cinematic, 1:1, PPT, PDF, Search, Agent, Voice etc. */
+.tool-chip,
+.select,
+.voice-select{
+    height:42px !important;
+    min-height:42px !important;
+    max-height:42px !important;
+    padding:7px 10px !important;
+    border-radius:13px !important;
+    font-size:12px !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+    min-width:auto !important;
+    flex:0 0 auto !important;
+}
+
+/* Make dropdowns smaller */
+.select{
+    width:104px !important;
+}
+#imageRatio{
+    width:72px !important;
+}
+.voice-select{
+    width:92px !important;
+    border:1px solid rgba(255,196,77,.16);
+    background:rgba(255,255,255,.055);
+    color:#fff7d6;
+    outline:none;
+}
+.voice-select option,
+.select option{
+    background:#160b02;
+}
+
+/* Make the text box area slightly lower and cleaner */
+.composer-wrap{
+    padding:8px 18px 14px !important;
+}
+
+.composer{
+    padding:8px !important;
+    gap:7px !important;
+}
+
+.icon-btn{
+    width:40px !important;
+    height:40px !important;
+    min-width:40px !important;
+    font-size:17px !important;
+}
+
+.send-btn{
+    width:54px !important;
+    height:40px !important;
+    min-width:54px !important;
+    font-size:19px !important;
+}
+
+/* Keep all buttons visible on desktop by allowing two tight rows if space is low */
+@media(min-width:901px){
+    .tool-bar{
+        flex-wrap:wrap !important;
+        max-height:92px !important;
+        overflow-y:hidden !important;
+    }
+    .tool-chip,
+    .select,
+    .voice-select{
+        height:38px !important;
+        min-height:38px !important;
+        max-height:38px !important;
+        font-size:11.5px !important;
+        padding:6px 9px !important;
+    }
+    .select{
+        width:100px !important;
+    }
+    #imageRatio{
+        width:68px !important;
+    }
+    .voice-select{
+        width:88px !important;
+    }
+}
+
+/* Mobile: horizontal scroll, but much smaller buttons */
+@media(max-width:900px){
+    .tool-bar{
+        gap:5px !important;
+        flex-wrap:nowrap !important;
+        overflow-x:auto !important;
+        padding-bottom:5px !important;
+    }
+    .tool-chip,
+    .select,
+    .voice-select{
+        height:36px !important;
+        min-height:36px !important;
+        max-height:36px !important;
+        font-size:11px !important;
+        padding:6px 8px !important;
+    }
+    .select{
+        width:96px !important;
+    }
+    #imageRatio{
+        width:62px !important;
+    }
+    .voice-select{
+        width:82px !important;
+    }
+    .composer-wrap{
+        padding:7px 7px max(9px,env(safe-area-inset-bottom)) !important;
+    }
+    .icon-btn{
+        width:36px !important;
+        height:36px !important;
+        min-width:36px !important;
+        font-size:15px !important;
+    }
+    .send-btn{
+        width:46px !important;
+        height:36px !important;
+        min-width:46px !important;
+        font-size:18px !important;
+    }
+}
+
+/* Very small screens */
+@media(max-width:430px){
+    .tool-chip,
+    .select,
+    .voice-select{
+        height:34px !important;
+        min-height:34px !important;
+        font-size:10.5px !important;
+        padding:5px 7px !important;
+    }
+    .select{
+        width:90px !important;
+    }
+    #imageRatio{
+        width:58px !important;
+    }
+    .voice-select{
+        width:78px !important;
+    }
+}

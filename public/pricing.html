@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SAIVEX Pricing</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:radial-gradient(circle at top,#402403,#080300 60%);color:#fff7d6;min-height:100vh;padding:26px}
+.header{text-align:center;margin-bottom:26px}
+h1{font-size:44px;color:#ffdf8a;letter-spacing:3px;text-shadow:0 0 24px rgba(255,191,60,.55)}
+.sub{color:#d8bd7a;margin-top:8px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:980px;margin:auto}
+.plan{background:rgba(255,255,255,.07);border:1px solid rgba(255,191,60,.28);border-radius:26px;padding:26px;box-shadow:0 0 35px rgba(255,191,60,.1)}
+.plan.premium{background:linear-gradient(145deg,rgba(255,191,60,.14),rgba(255,255,255,.055));border-color:rgba(255,191,60,.55)}
+.plan h2{color:#ffbf3c;margin-bottom:10px;font-size:25px}
+.price{font-size:34px;font-weight:900;margin:16px 0;color:#fff}
+ul{margin:18px 0 24px;padding-left:20px;color:#ead6a3}
+li{margin:10px 0}
+button,.btn{width:100%;display:block;text-align:center;padding:15px;border:0;border-radius:18px;background:linear-gradient(90deg,#ffbf3c,#ff6a00);font-weight:900;color:#170800;cursor:pointer;text-decoration:none}
+.back{max-width:980px;margin:24px auto 0}.back a{color:#ffdf8a;text-decoration:none}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(255,191,60,.13);border:1px solid rgba(255,191,60,.35);color:#ffdf8a;font-size:12px;font-weight:900;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>SAIVEX Plans</h1>
+<p class="sub">Free for creators. Premium for advanced power tools.</p>
+</div>
+
+<div class="plans">
+<div class="plan">
+<span class="badge">FREE</span>
+<h2>Free Plan</h2>
+<div class="price">₹0</div>
+<ul>
+<li>Unlimited chat</li>
+<li>Unlimited image generation</li>
+<li>Unlimited PPT/PDF/website generation</li>
+<li>Kalinga UI</li>
+<li>Agent mode</li>
+<li>Web search</li>
+<li>File upload</li>
+</ul>
+<a class="btn" href="index.html">Continue Free</a>
+</div>
+
+<div class="plan premium">
+<span class="badge">PREMIUM</span>
+<h2>Premium Monthly</h2>
+<div class="price">₹199/mo</div>
+<ul>
+<li>Everything in Free</li>
+<li>Code execution</li>
+<li>Voice conversations</li>
+<li>Wake mode</li>
+<li>Camera vision</li>
+</ul>
+<button onclick="buyPlan('premium_monthly')">Upgrade Monthly</button>
+</div>
+
+<div class="plan premium">
+<span class="badge">BEST VALUE</span>
+<h2>Premium Yearly</h2>
+<div class="price">₹1999/yr</div>
+<ul>
+<li>Everything in Premium Monthly</li>
+<li>Long-term access</li>
+<li>Best value for serious users</li>
+<li>Future premium benefits</li>
+</ul>
+<button onclick="buyPlan('premium_yearly')">Upgrade Yearly</button>
+</div>
+</div>
+
+<div class="back"><a href="index.html">← Back to SAIVEX</a></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+async function buyPlan(plan){
+    const res = await fetch("/create_payment_order", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({plan:plan})
+    });
+
+    const data = await res.json();
+
+    if(data.status !== "success"){
+        alert(data.message || "Payment setup failed. Add Razorpay keys in .env.");
+        return;
+    }
+
+    const options = {
+        key: data.key,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: "SAIVEX",
+        description: data.plan.name,
+        order_id: data.order.id,
+        handler: async function(response){
+            const verify = await fetch("/payment_success", {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({
+                    plan:plan,
+                    razorpay_order_id:response.razorpay_order_id,
+                    razorpay_payment_id:response.razorpay_payment_id,
+                    razorpay_signature:response.razorpay_signature
+                })
+            });
+            const verified = await verify.json();
+            if(verified.status === "success"){
+                alert("Premium activated successfully!");
+                window.location.href = "/";
+            }else{
+                alert(verified.message || "Payment verification failed.");
+            }
+        },
+        prefill: {
+            name: "",
+            email: ""
+        },
+        theme: { color: "#ffbf3c" }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+}
+</script>
+</body>
+</html>

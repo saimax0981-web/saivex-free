@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+<head><title>SAIVEX Settings</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:Arial;min-height:100vh;background:radial-gradient(circle at top left,rgba(255,190,72,.22),transparent 35%),linear-gradient(135deg,#080300,#061324);color:#fff7d6;display:flex;justify-content:center;align-items:center;padding:18px}.card{width:100%;max-width:430px;background:rgba(255,196,77,.08);border:1px solid rgba(255,196,77,.25);border-radius:24px;padding:28px}h1{text-align:center;color:#ffdf8a}.row{padding:14px;border-radius:14px;background:rgba(255,255,255,.06);margin:12px 0}select{width:100%;padding:12px;border-radius:12px;background:#140a02;color:white;border:1px solid rgba(255,196,77,.25)}button,.btn{display:block;width:100%;box-sizing:border-box;text-align:center;margin-top:16px;padding:13px;border-radius:14px;background:#b66a00;color:white;text-decoration:none;border:none;font-weight:bold}
+</style></head>
+<body><div class="card"><h1>Settings</h1><form method="POST" action="/update_settings"><div class="row">Theme<select name="theme"><option value="kalinga">Kalinga</option><option value="dark">Dark</option></select></div><div class="row">Image Style<select name="image_style"><option value="cinematic">Cinematic</option><option value="realistic">Realistic</option><option value="anime">Anime</option></select></div><div class="row"><label><input type="checkbox" name="voice_enabled" checked> Voice enabled</label></div><button>Save Settings</button></form><a class="btn" href="index.html">Back to SAIVEX</a></div></body>
+</html>

@@ -1,0 +1,43 @@
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+    radial-gradient(circle at 20% 20%, rgba(255,191,60,.18), transparent 30%),
+    radial-gradient(circle at 80% 80%, rgba(0,212,255,.12), transparent 35%);
+    animation:saivexGlow 8s ease-in-out infinite alternate;
+    z-index:-1;
+}
+
+@keyframes saivexGlow{
+    from{opacity:.55;filter:blur(0)}
+    to{opacity:1;filter:blur(2px)}
+}
+
+.bot,.user,.profile-box,.conversation-item,.memory-box,.document-box{
+    backdrop-filter:blur(18px);
+}
+
+.send,.new-chat{
+    box-shadow:0 0 22px rgba(255,191,60,.35);
+    transition:.2s;
+}
+
+.send:hover,.new-chat:hover,.tool-chip:hover,.icon:hover{
+    transform:translateY(-1px) scale(1.02);
+    box-shadow:0 0 28px rgba(255,191,60,.45);
+}
+
+.header{
+    box-shadow:0 10px 38px rgba(0,0,0,.42), inset 0 -1px 0 rgba(255,191,60,.2);
+}
+
+.title{
+    animation:titlePulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes titlePulse{
+    from{text-shadow:0 0 8px #ffbf3c}
+    to{text-shadow:0 0 18px #ffbf3c,0 0 34px rgba(0,212,255,.45)}
+}

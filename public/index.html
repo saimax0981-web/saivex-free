@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SAIVEX Kalinga</title>
+
+<link rel="manifest" href="static/manifest.json">
+<meta name="theme-color" content="#b66a00">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Cinzel:wght@600;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="static/phase11_kalinga.css">
+<link rel="stylesheet" href="static/phase13_voice.css">
+</head>
+
+<body>
+<div class="kalinga-bg">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="orb orb-three"></div>
+    <div class="grid-glow"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+
+<aside class="sidebar" id="sidebar">
+    <div class="brand">
+        <div class="logo-ring">
+            <img src="static/logo.png" class="side-logo">
+        </div>
+        <div>
+            <div class="brand-name">SAIVEX</div>
+            <div class="brand-sub">Kalinga AI</div>
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <div class="profile-title">Signed in</div>
+        <div class="profile-name">Sai Venkat</div>
+        <div class="profile-actions">
+            <a href="profile.html">Profile</a>
+            <a href="settings.html">Settings</a>
+            <a href="admin.html">Admin</a>
+            <a href="login.html" class="danger">Logout</a>
+        </div>
+    </div>
+
+    <div class="sidebar-actions">
+        <button class="new-chat" onclick="newChat()">+ New Chat</button>
+        <button class="clear-chat" onclick="clearHistory()">Clear</button>
+    </div>
+
+    <input class="search-box" id="searchBox" placeholder="Search conversations..." oninput="renderConversations()">
+
+    <div class="section-title">Chats</div>
+    <div id="conversationPanel" class="panel-list"></div>
+
+    <div class="section-title">Memory</div>
+    <div id="memoryPanel" class="panel-list"></div>
+
+    <div class="section-title">Documents</div>
+    <div id="documentPanel" class="panel-list"></div>
+</aside>
+
+<main class="main">
+    <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <img src="static/logo.png" class="top-logo">
+            <div>
+                <h1>SAIVEX</h1>
+                <p>Brain 2.0 · Premium Kalinga UI</p>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <button class="mini-chip" onclick="setPrompt('brain: ')">Brain</button>
+            <button class="mini-chip" onclick="setPrompt('agent: ')">Agent</button>
+            <button class="mini-chip" onclick="openSaivexCamera()">Camera</button>
+        </div>
+    </header>
+
+    <section id="dropZone" class="chat-area">
+        <div id="chatbox">
+            <div class="empty-state" id="emptyState">
+                <div class="hero-badge">👑 KALINGA MODE</div>
+                <h2>What shall we build today?</h2>
+                <p>Ask SAIVEX to think, create, search, code, generate files, analyze images, or continue your project.</p>
+
+                <div class="quick-grid">
+                    <button onclick="setPrompt('agent: create a full plan for my SAIVEX project')">🤖 Agent Plan</button>
+                    <button onclick="setPrompt('create ppt about Kalinga empire')">📊 Create PPT</button>
+                    <button onclick="setPrompt('generate image of futuristic Kalinga city')">🎨 Generate Image</button>
+                    <button onclick="setPrompt('search: latest AI news')">🔎 Search Web</button>
+                    <button onclick="setPrompt('explain my uploaded image')">👁️ Vision</button>
+                    <button onclick="setPrompt('run code: print(\"Hello SAIVEX\")')">💻 Run Code</button>
+                </div>
+
+                <div class="drop-hint">Drag & drop PDF, DOCX, TXT, PNG, JPG, or WEBP here</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="composer-wrap">
+        <div class="tool-bar">
+            <select id="imageStyle" class="select">
+                <option value="cinematic">Cinematic</option>
+                <option value="realistic">Realistic</option>
+                <option value="anime">Anime</option>
+                <option value="logo">Logo</option>
+                <option value="wallpaper">Wallpaper</option>
+                <option value="fantasy">Fantasy</option>
+            </select>
+
+            <select id="imageRatio" class="select">
+                <option value="1:1">1:1</option>
+                <option value="16:9">16:9</option>
+                <option value="9:16">9:16</option>
+                <option value="4:5">4:5</option>
+            </select>
+
+            <button class="tool-chip" onclick="toolPrompt('ppt')">📊 PPT</button>
+            <button class="tool-chip" onclick="toolPrompt('pdf')">📄 PDF</button>
+            <button class="tool-chip" onclick="toolPrompt('website')">🌐 Website</button>
+            <button class="tool-chip" onclick="toolPrompt('code')">💻 Code</button>
+            <button class="tool-chip" onclick="toolPrompt('search')">🔎 Search</button>
+            <button class="tool-chip" onclick="toolPrompt('agent')">🤖 Agent</button>
+            <select id="voiceLang" class="voice-select">
+                <option value="en-US">English</option>
+                <option value="te-IN">Telugu</option>
+                <option value="hi-IN">Hindi</option>
+            </select>
+            <button class="tool-chip" onclick="startSaivexVoice13()">🎙️ Voice</button>
+            <button class="tool-chip" onclick="startSaivexWakeMode()">👂 Wake</button>
+            <button class="tool-chip" onclick="interruptSaivexVoice13()">✋ Interrupt</button>
+            <button class="tool-chip stop" onclick="stopSaivexVoice13()">⏹️ Stop</button>
+            <button class="tool-chip" onclick="openSaivexCamera()">📷 Camera</button>
+        </div>
+
+        <div class="composer">
+            <button class="icon-btn" id="voiceBtn" onclick="startVoice()">🎤</button>
+            <button class="icon-btn" onclick="uploadFile()">📎</button>
+            <button class="icon-btn" onclick="uploadImage()">👁️</button>
+
+            <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt" onchange="handleFileUpload()">
+            <input type="file" id="imageInput" style="display:none" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="handleImageUpload()">
+
+            <textarea id="message" rows="1" placeholder="Message SAIVEX..."></textarea>
+
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </section>
+</main>
+
+</div>
+
+<script src="static/stage3_app.js"></script>
+<script src="static/phase11_ui.js"></script>
+<script src="static/voice_conversation.js"></script>
+<script src="static/saivex_voice13.js"></script>
+<script src="static/camera_vision.js"></script>
+<script src="static/pwa_register.js"></script>
+
+</body>
+</html>
