@@ -41,12 +41,12 @@
 
     <div class="profile-card">
         <div class="profile-title">Signed in</div>
-        <div class="profile-name">Sai Venkat</div>
+        <div class="profile-name" id="profileName">Sai Venkat</div>
         <div class="profile-actions">
             <a href="profile.html">Profile</a>
             <a href="settings.html">Settings</a>
             <a href="admin.html">Admin</a>
-            <a href="login.html" class="danger">Logout</a>
+            <a href="login.html" onclick="localStorage.removeItem('saivex_user')" class="danger">Logout</a>
         </div>
     </div>
 

@@ -20,7 +20,7 @@ p{color:#d6c08a;font-size:13px;text-align:center}
 <img src="/static/logo.png" class="logo">
 <h1>JOIN SAIVEX</h1>
 <p>Password must be at least 6 characters.</p>
-<form method="POST">
+<form data-auth="signup">
 <input name="name" placeholder="Your name" required>
 <input name="email" type="email" placeholder="Email address" required>
 <input name="password" type="password" placeholder="Password" required>
@@ -28,5 +28,6 @@ p{color:#d6c08a;font-size:13px;text-align:center}
 </form>
 <a href="login.html">Already have account?</a>
 </div>
+<script src="static/local_auth.js"></script>
 </body>
 </html>

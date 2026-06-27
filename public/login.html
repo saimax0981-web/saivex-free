@@ -126,14 +126,14 @@ h1{text-align:center;font-family:Cinzel,serif;font-size:34px;letter-spacing:7px;
 <p class="subtitle">Enter the Kalinga AI command system</p>
 
 <div class="social-row">
-<a class="social-btn" href="/login/google">🌐 Continue with Google</a>
-<a class="social-btn" href="/login/apple"> Continue with Apple</a>
-<a class="social-btn" href="/login/phone">📞 Continue with Phone</a>
+<a class="social-btn" href="#" data-social="Google">🌐 Continue with Google</a>
+<a class="social-btn" href="#" data-social="Apple"> Continue with Apple</a>
+<a class="social-btn" href="phone_login.html">📞 Continue with Phone</a>
 </div>
 
 <div class="divider">OR</div>
 
-<form method="POST" action="/login">
+<form data-auth="login">
 <div class="field"><span>✉</span><input type="email" name="email" placeholder=" " required autocomplete="email"><label>Email address</label></div>
 <div class="field"><span>🔒</span><input type="password" name="password" placeholder=" " required autocomplete="current-password"><label>Password</label></div>
 <button class="login-btn" type="submit">ENTER SAIVEX</button>
@@ -163,5 +163,6 @@ for(let i=0;i<180;i++){particles.push({x:Math.random()*innerWidth,y:Math.random(
 function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.y-=p.s;if(p.y<0){p.y=innerHeight;p.x=Math.random()*innerWidth}ctx.beginPath();ctx.fillStyle=p.c;ctx.globalAlpha=.55;ctx.shadowBlur=14;ctx.shadowColor=p.c;ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()});requestAnimationFrame(draw)}
 draw();
 </script>
+<script src="static/local_auth.js"></script>
 </body>
 </html>
